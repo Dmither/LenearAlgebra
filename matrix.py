@@ -1,5 +1,6 @@
+import math
+
 class Matrix:
-  
   def __init__(self, arr=[[0]]):
     self.rows = len(arr)
     self.cols = len(arr[0])
@@ -32,7 +33,9 @@ class Matrix:
     rows = self.rows
     cols = self.cols
 
-    if (isinstance(target, int)):
+    if (isinstance(target, int) or isinstance(target, float)):
+      if math.ceil(target) == target:
+        target = int(target)
       arr = []
       for i in range(rows):
         row = []
@@ -90,4 +93,48 @@ class Matrix:
     return Matrix(arr)
   
   def getDeterminante(self):
-    pass
+    rows = self.rows
+    if rows == 0:
+      return
+    if rows == 1:
+      return self.body[0][0]
+    res = 0
+    for i in range(rows):
+      algAd = self.getAlgAdd(0, i)
+      res += self.body[0][i] * algAd
+    return res
+
+  def getMinor(self, mi, mj):
+    rows = self.rows
+    arr = []
+    for i in range(rows):
+      if i == mi:
+        continue
+      row = []
+      for j in range(rows):
+        if j == mj:
+          continue
+        row.append(self.body[i][j])
+      arr.append(row)
+    return Matrix(arr).getDeterminante()
+  
+  def getAlgAdd(self, mi, mj):
+    return ((-1) ** (2 + mi + mj)) * self.getMinor(mi, mj)
+  
+  def getAddition(self):
+    rows = self.rows
+    arr = []
+    for i in range(rows):
+      row = []
+      for j in range(rows):
+        row.append(self.getAlgAdd(i, j))
+      arr.append(row)
+    return Matrix(arr).transport()
+  
+  def getReverse(self):
+    det = self.getDeterminante()
+    addition = self.getAddition()
+    print(det)
+    print(addition)
+    return addition.mul(1 / det)
+    
